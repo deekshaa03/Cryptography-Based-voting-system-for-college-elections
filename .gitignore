@@ -1,6 +1,6 @@
-# ============================
+# =========================================
 # PYTHON BACKEND IGNORE
-# ============================
+# =========================================
 
 backend/venv/
 backend/__pycache__/
@@ -9,10 +9,11 @@ backend/*.pyo
 backend/*.pyd
 backend/.pytest_cache/
 
-# Python env files
+# Environment files
 *.env
+backend/.env
 
-# Do NOT upload generated encrypted files
+# Large generated encrypted / compiled files
 backend/*.bin
 backend/*.csv
 backend/*.zip
@@ -22,24 +23,41 @@ backend/*.o
 backend/*.out
 backend/*.exe
 
-# ============================
+# Logs
+backend/*.log
+
+# =========================================
 # FRONTEND IGNORE
-# ============================
+# =========================================
 
 frontend/node_modules/
 frontend/build/
 frontend/dist/
+frontend/dist-ssr/
 frontend/.env
+frontend/*.local
 
-# React cache
+# React / bundler caches
 frontend/.parcel-cache/
 frontend/.next/
 frontend/.vite/
 
-# ============================
-# SYSTEM / EDITOR
-# ============================
+# Log files
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# =========================================
+# SYSTEM / EDITOR / OS
+# =========================================
 
 .vscode/
 .DS_Store
 Thumbs.db
+
+# Project-specific images/zips if needed
+*.zip
