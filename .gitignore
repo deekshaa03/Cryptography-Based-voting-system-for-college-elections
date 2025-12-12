@@ -1,14 +1,45 @@
-# Python
-venv/
+# ============================
+# PYTHON BACKEND IGNORE
+# ============================
+
 backend/venv/
-__pycache__/
-*.pyc
-.env
+backend/__pycache__/
+backend/*.pyc
+backend/*.pyo
+backend/*.pyd
+backend/.pytest_cache/
 
-# Node / React
-node_modules/
-dist/
-build/
+# Python env files
+*.env
 
-# OS files
+# Do NOT upload generated encrypted files
+backend/*.bin
+backend/*.csv
+backend/*.zip
+
+# Compiled executables
+backend/*.o
+backend/*.out
+backend/*.exe
+
+# ============================
+# FRONTEND IGNORE
+# ============================
+
+frontend/node_modules/
+frontend/build/
+frontend/dist/
+frontend/.env
+
+# React cache
+frontend/.parcel-cache/
+frontend/.next/
+frontend/.vite/
+
+# ============================
+# SYSTEM / EDITOR
+# ============================
+
+.vscode/
 .DS_Store
+Thumbs.db
