@@ -1,5 +1,3 @@
-
-
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import csv
@@ -14,16 +12,15 @@ CORS(app)
 CSV_FILE = "voteCollected.csv"
 ZIP_FILE = "voteCollected.zip"
 ZIP_PASSWORD = "admin@123"
-
+CPP_FILE = "encrypt_votes.cpp"
+BINARY_FILE = "encrypt_votes"
 
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
-
 @app.route("/")
 def home():
     return "Backend Running!", 200
-
 
 @app.route("/submit_vote", methods=["POST"])
 def submit_vote():
@@ -59,17 +56,13 @@ def submit_vote():
 
     extra_value = "4CB22CB099"
 
-    # ------------------------------------------------------------------
     # STEP 1: Extract existing CSV from ZIP (if ZIP already exists)
-    # ------------------------------------------------------------------
     if os.path.exists(ZIP_FILE):
         subprocess.run([
             "unzip", "-P", ZIP_PASSWORD, ZIP_FILE
         ])
 
-    # ------------------------------------------------------------------
     # STEP 2: Create CSV with header if not exists
-    # ------------------------------------------------------------------
     file_exists = os.path.exists(CSV_FILE)
 
     with open(CSV_FILE, "a", newline="") as file:
@@ -91,21 +84,51 @@ def submit_vote():
             extra_value
         ])
 
-    # ------------------------------------------------------------------
     # STEP 3: Repack into password-protected ZIP
-    # ------------------------------------------------------------------
     subprocess.run([
         "zip", "-P", ZIP_PASSWORD, ZIP_FILE, CSV_FILE
     ])
 
-    # ------------------------------------------------------------------
     # STEP 4: Delete extracted CSV (only zip remains)
-    # ------------------------------------------------------------------
     if os.path.exists(CSV_FILE):
         os.remove(CSV_FILE)
 
     return jsonify({"message": "Vote submitted successfully"}), 200
 
+@app.route("/encrypt_votes", methods=["POST"])
+def encrypt_votes():
+    try:
+        if not os.path.exists(CSV_FILE):
+            return jsonify({"error": "No votes found to encrypt"}), 400
+
+        # Step 1: Compile the C++ program if binary doesn't exist
+        if not os.path.exists(BINARY_FILE):
+            compile_cmd = [
+                "g++", CPP_FILE, "-o", BINARY_FILE, "-lhelib", "-lntl", "-lgmp", "-std=c++17"
+            ]
+            result_compile = subprocess.run(
+                compile_cmd, capture_output=True, text=True
+            )
+            if result_compile.returncode != 0:
+                return jsonify({"error": f"Compilation failed: {result_compile.stderr}"}), 500
+
+        # Step 2: Run the encrypt_votes binary
+        result = subprocess.run(
+            ["./" + BINARY_FILE],
+            capture_output=True,
+            text=True
+        )
+
+        if result.returncode != 0:
+            return jsonify({"error": result.stderr}), 500
+
+        return jsonify({
+            "message": "Votes encrypted successfully",
+            "output": result.stdout
+        }), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
     print("🚀 Starting Flask backend on http://127.0.0.1:5000 ...")
